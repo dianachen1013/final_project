@@ -6,7 +6,7 @@
   }
   
   /* Heatmap section (left) */
-  .heatmap {
+  .Heatmap {
     width: 66.67%;
     height: 100%;
     border-right: 1px solid #ddd; /* Optional separator */
@@ -20,13 +20,13 @@
   }
   
   /* Pie chart (top half) */
-  .pie-chart {
+  .PieChart {
     height: 50%;
     border-bottom: 1px solid #ddd; /* Optional separator */
   }
   
   /* Line chart (bottom half) */
-  .line-chart {
+  .LineChart {
     height: 50%;
   }
   
