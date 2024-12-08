@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import GridBaseHeatmap from '../components/GridBaseHeatmap';
-import PieChart from '../components/PieChart';
-import LineChart from '../components/LineChart';
 import finalProjectConfig from './final_project_danqing';
+import GridBaseHeatmap from '../components/assignment6/grid_based_heatmap';
+import PieChart from '../components/assignment6/PieChart';
+import LineChart from '../components/assignment6/LineChart';
 
 const FinalProject = () => {
   const [selectedCountry, setSelectedCountry] = useState(null);
