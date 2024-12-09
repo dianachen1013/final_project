@@ -33,7 +33,7 @@ const Heatmap = ({ onGridClick }) => {
 
     const width = 800;
     const height = 400;
-    const margin = { top: 50, right: 20, bottom: 50, left: 150 }; // Increase left margin for rankings
+    const margin = { top: 50, right: 20, bottom: 50, left: 150 }; // Increased left margin for rankings
 
     // Extract years dynamically from the dataset
     const years = Array.from(new Set(data.map((d) => d.Year)))
@@ -44,12 +44,16 @@ const Heatmap = ({ onGridClick }) => {
     const rankings = {};
     years.forEach((year) => {
       const countriesForYear = data.filter((d) => d.Year === year);
-      countriesForYear.sort((a, b) => b.Total - a.Total);
-      countriesForYear.forEach((d, i) => {
-        if (!rankings[d.Country]) rankings[d.Country] = {};
-        rankings[d.Country][year] = `${i + 1}/15`; // Rank starts at 1
-      });
+      countriesForYear
+        .sort((a, b) => b.Total - a.Total) // Descending order of CO2 emissions
+        .forEach((d, i) => {
+          if (!rankings[d.Country]) rankings[d.Country] = {};
+          rankings[d.Country][year] = `${i + 1}/15`; // Rank starts at 1
+        });
     });
+
+    // Debugging: Check rankings
+    console.log("Rankings:", rankings);
 
     // Sort countries by total emission in descending order (across all years)
     const countries = Array.from(new Set(data.map((d) => d.Country))).sort((a, b) => {
@@ -167,7 +171,7 @@ const Heatmap = ({ onGridClick }) => {
           <p><strong>Country:</strong> {annotation.data.Country}</p>
           <p><strong>Year:</strong> {annotation.data.Year}</p>
           <p><strong>GDP:</strong> {(annotation.data.GDP * 10).toFixed(2)} billion USD</p>
-          <p><strong>Population:</strong> {annotation.data.Population.toLocaleString()} </p>
+          <p><strong>Population:</strong> {annotation.data.Population.toLocaleString()} million</p>
           <p><strong>CO2 Emissions:</strong> {(annotation.data.Total).toFixed(2)} million metric tons</p>
         </div>
       )}
