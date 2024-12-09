@@ -56,8 +56,16 @@ const Heatmap = ({ onGridClick }) => {
       });
 
     // Scales
-    const x = d3.scaleBand().domain(years).range([margin.left, width - margin.right]).padding(0.1);
-    const y = d3.scaleBand().domain(countries).range([margin.top, height - margin.bottom]).padding(0.1);
+    const x = d3
+      .scaleBand()
+      .domain(years)
+      .range([margin.left, width - margin.right])
+      .padding(0.1);
+    const y = d3
+      .scaleBand()
+      .domain(countries)
+      .range([margin.top, height - margin.bottom])
+      .padding(0.1);
 
     const color = d3
       .scaleSequential()
@@ -117,19 +125,22 @@ const Heatmap = ({ onGridClick }) => {
 
     // Add vertical color bar
     const colorBarHeight = 300;
-    const colorBarScale = d3.scaleLinear().domain(color.domain()).range([colorBarHeight, 0]);
+    const colorBarScale = d3
+      .scaleLinear()
+      .domain(color.domain())
+      .range([colorBarHeight, 0]); // Reverse scale for proper color mapping
 
     const colorAxis = d3.axisRight(colorBarScale).ticks(6).tickFormat((d) => `10^${Math.round(d)}`);
 
     colorBar
       .append("g")
       .selectAll("rect")
-      .data(d3.range(0, 1, 0.01))
+      .data(d3.range(0, 1, 0.01)) // Create fine gradient steps
       .join("rect")
       .attr("x", 0)
       .attr("y", (d) => d * colorBarHeight)
       .attr("width", 20)
-      .attr("height", 1)
+      .attr("height", colorBarHeight / 100)
       .attr("fill", (d) => color(colorBarScale.invert(d * colorBarHeight)));
 
     colorBar.append("g").attr("transform", "translate(20, 0)").call(colorAxis);
