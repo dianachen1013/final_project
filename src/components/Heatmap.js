@@ -72,7 +72,7 @@ const Heatmap = ({ onGridClick }) => {
     const size = d3
       .scaleSqrt()
       .domain(d3.extent(data, (d) => d.Total))
-      .range([4, x.bandwidth() ]);
+      .range([2, x.bandwidth() / 2]);
 
     // Create heatmap squares
     svg
