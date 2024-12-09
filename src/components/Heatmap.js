@@ -56,11 +56,15 @@ const Heatmap = ({ onGridClick }) => {
     const x = d3.scaleBand().domain(years).range([margin.left, width - margin.right]).padding(0.1);
     const y = d3.scaleBand().domain(countries).range([margin.top, height - margin.bottom]).padding(0.1);
 
-    // Use a logarithmic scale for smoother color transitions
+    // Configure separate color scales for metrics
     const color = d3
       .scaleSequential()
-      .domain([Math.log10(1), Math.log10(d3.max(data, (d) => d[metric] || 1))]) // Ensure no white shades
-      .interpolator(d3.interpolateGreens);
+      .domain(
+        metric === "Population"
+          ? [Math.log10(d3.min(data, (d) => d.Population) || 1), Math.log10(d3.max(data, (d) => d.Population))]
+          : [Math.log10(1), Math.log10(d3.max(data, (d) => d[metric] || 1))]
+      ) // Avoid log(0)
+      .interpolator(metric === "Population" ? d3.interpolateBlues : d3.interpolateGreens); // Use distinct colors for Population
 
     // Use size scale for CO2 emissions
     const size = d3
