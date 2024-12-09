@@ -17,9 +17,9 @@ const PieChart = ({ data }) => {
 
     // Define custom colors for the pie chart
     const color = d3.scaleOrdinal([
-      "#a0b858", // Coal
+      "#81b0b2", // Coal
       "#00738c", // Oil
-      "#81b0b2", // Gas
+      "#a0b858", // Gas
       "#cbe3ca", // Cement
       "#e2deb9", // Flaring
       "#97a675", // Other
