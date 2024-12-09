@@ -2,60 +2,62 @@
 .container {
   display: flex;
   flex-direction: column;
-  background-color: #fffaf0; /* 浅米色背景 */
   height: 100vh;
   width: 100%;
-  padding: 10px;
-  box-sizing: border-box;
+  background-color: #fdf6e3; /* Light beige background */
 }
 
-/* Heatmap section (full width on top) */
+/* Heatmap section (full width) */
 .Heatmap {
+  flex: 2;
   width: 100%;
-  height: 60%; /* 60% 页面高度 */
-  border-bottom: 2px solid #ddd; /* 底部分隔线 */
-  padding: 20px; /* 添加内边距 */
-  box-sizing: border-box;
+  padding: 20px; /* Add padding for better spacing */
+  border-bottom: 1px solid #ddd; /* Optional separator */
 }
 
-/* Bottom charts container (PieChart and LineChart) */
+/* Bottom charts container */
 .bottom-charts {
+  flex: 1;
   display: flex;
-  flex-direction: row; /* 水平方向排列 */
-  height: 40%; /* 40% 页面高度 */
-  gap: 20px; /* 两个图表之间的间距 */
-  padding: 10px; /* 内边距 */
+  width: 100%;
+  padding: 20px; /* Add padding for spacing */
+  gap: 20px; /* Space between PieChart and LineChart */
 }
 
-/* Pie chart (left side) */
+/* Pie chart (left half) */
 .PieChart {
-  width: 40%; /* 占宽度的40% */
-  height: 100%; /* 占满父容器高度 */
-  background-color: #ffffff; /* 白色背景 */
-  border: 1px solid #ddd; /* 边框 */
-  border-radius: 8px; /* 圆角 */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* 阴影 */
-  padding: 10px; /* 内边距 */
-  box-sizing: border-box;
+  flex: 1;
+  display: flex;
+  justify-content: center; /* Center the PieChart */
+  align-items: center; /* Center vertically */
+  padding: 10px;
+  background-color: #ffffff; /* White background */
+  border: 1px solid #ddd; /* Optional border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
-/* Line chart (right side) */
+/* Line chart (right half) */
 .LineChart {
-  width: 60%; /* 占宽度的60% */
-  height: 100%; /* 占满父容器高度 */
-  background-color: #ffffff; /* 白色背景 */
-  border: 1px solid #ddd; /* 边框 */
-  border-radius: 8px; /* 圆角 */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* 阴影 */
-  padding: 10px; /* 内边距 */
-  box-sizing: border-box;
+  flex: 2;
+  display: flex;
+  justify-content: center; /* Center the LineChart */
+  align-items: center; /* Center vertically */
+  padding: 10px;
+  background-color: #ffffff; /* White background */
+  border: 1px solid #ddd; /* Optional border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
-/* Optional: Header styling for the Heatmap section */
-.Heatmap h1 {
-  margin: 0 0 10px 0;
-  color: #333; /* 深灰色字体 */
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
+/* Adjust axis labels for better visibility */
+.LineChart .x-axis text {
+  transform: rotate(0); /* Horizontal axis labels */
+  text-anchor: middle; /* Center-align the text */
+}
+
+/* Optional: Adjust heatmap x-axis spacing */
+.Heatmap svg .x-axis text {
+  transform: rotate(-45); /* Diagonal labels */
+  text-anchor: end;
 }
