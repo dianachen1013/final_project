@@ -21,7 +21,7 @@ const PieChart = ({ data }) => {
 
     // Create pie chart
     const pieGroup = svg
-      .attr("viewBox", `0 0 ${width + 100} ${height + 100}`)
+      .attr("viewBox", `0 0 ${width + 200} ${height + 100}`)
       .append("g")
       .attr("transform", `translate(${width / 2},${height / 2})`);
 
@@ -32,18 +32,19 @@ const PieChart = ({ data }) => {
       .attr("d", arc)
       .attr("fill", (d, i) => color(i))
       .on("mouseover", (event, d) => {
-        const [x, y] = d3.pointer(event);
         svg
           .append("text")
           .attr("id", "tooltip")
-          .attr("x", x + width / 2 - 50)
-          .attr("y", y + height / 2 - 50)
-          .attr("text-anchor", "middle")
+          .attr("x", width / 2 + radius +100) // 右下角相对位置
+          .attr("y", height / 2 + radius - 20) // 右下角距离底部一定高度
+          .attr("text-anchor", "end") // 右对齐
+          .style("font-size", "10px")
           .text(`${d.data.label}: ${d.data.value} (${d.data.percentage}%)`);
       })
       .on("mouseout", () => {
         svg.select("#tooltip").remove();
       });
+      
 
     // Create legend
     const legendGroup = svg
