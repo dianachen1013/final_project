@@ -2,7 +2,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh; /* Use min-height to cover the viewport height */
   width: 100%;
   background-color: #fdf6e3; /* Light beige background */
 }
@@ -13,6 +13,7 @@
   width: 100%;
   padding: 20px; /* Add padding for better spacing */
   border-bottom: 1px solid #ddd; /* Optional separator */
+  background-color: #fdf6e3; /* Ensure heatmap section matches the overall background */
 }
 
 /* Bottom charts container */
@@ -22,6 +23,7 @@
   width: 100%;
   padding: 20px; /* Add padding for spacing */
   gap: 20px; /* Space between PieChart and LineChart */
+  background-color: #fdf6e3; /* Match the overall background color */
 }
 
 /* Pie chart (left half) */
@@ -60,4 +62,11 @@
 .Heatmap svg .x-axis text {
   transform: rotate(-45); /* Diagonal labels */
   text-anchor: end;
+}
+
+/* Ensure body background matches overall theme */
+body {
+  margin: 0;
+  background-color: #fdf6e3; /* Light beige background */
+  font-family: Arial, sans-serif; /* Optional: Set a default font */
 }
