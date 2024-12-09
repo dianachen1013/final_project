@@ -58,8 +58,9 @@ const Heatmap = ({ onGridClick }) => {
 
     // Use a logarithmic scale for smoother color transitions
     const color = d3
-      .scaleSequential(d3.interpolateGreens)
-      .domain(d3.extent(data, (d) => Math.log10(d[metric] || 1))); // Avoid log(0)
+      .scaleSequential()
+      .domain([Math.log10(1), Math.log10(d3.max(data, (d) => d[metric] || 1))]) // Ensure no white shades
+      .interpolator(d3.interpolateGreens);
 
     // Use size scale for CO2 emissions
     const size = d3
@@ -77,7 +78,7 @@ const Heatmap = ({ onGridClick }) => {
       .attr("y", (d) => y(d.Country))
       .attr("width", (d) => size(d.Total)) // Size based on CO2 emissions
       .attr("height", (d) => size(d.Total))
-      .attr("fill", (d) => color(Math.log10(d[metric] || 1))) // Log-transformed color
+      .attr("fill", (d) => color(Math.log10(d[metric] || 1))) // Updated color scale
       .on("click", (event, d) => {
         // Update annotation box on click
         setAnnotation({
