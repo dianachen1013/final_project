@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 
@@ -31,7 +32,7 @@ const Heatmap = ({ onGridClick }) => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const width = 100;
+    const width = 1000;
     const height = 500;
     const margin = { top: 50, right: 20, bottom: 50, left: 100 };
 
@@ -134,7 +135,7 @@ const Heatmap = ({ onGridClick }) => {
       </div>
 
       {/* Heatmap SVG */}
-      <svg ref={svgRef} width={800} height={400}></svg>
+      <svg ref={svgRef} width={1000} height={500}></svg>
 
       {/* Annotation Box */}
       {annotation && (
