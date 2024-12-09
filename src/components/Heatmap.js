@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 
@@ -7,6 +6,7 @@ const dataUrl =
 
 const Heatmap = ({ onGridClick }) => {
   const svgRef = useRef();
+  const colorBarRef = useRef(); // Ref for the color bar
   const [data, setData] = useState([]);
   const [metric, setMetric] = useState("Population"); // Default metric
   const [annotation, setAnnotation] = useState(null); // State for annotation box
@@ -30,7 +30,9 @@ const Heatmap = ({ onGridClick }) => {
     if (data.length === 0) return;
 
     const svg = d3.select(svgRef.current);
+    const colorBarSvg = d3.select(colorBarRef.current);
     svg.selectAll("*").remove();
+    colorBarSvg.selectAll("*").remove();
 
     const width = 1000;
     const height = 500;
@@ -67,7 +69,6 @@ const Heatmap = ({ onGridClick }) => {
       ) // Avoid log(0)
       .interpolator(metric === "Population" ? d3.interpolateBlues : d3.interpolateGreens); // Use distinct colors for Population
 
-    // Use size scale for CO2 emissions
     const size = d3
       .scaleSqrt()
       .domain(d3.extent(data, (d) => d.Total))
@@ -83,9 +84,8 @@ const Heatmap = ({ onGridClick }) => {
       .attr("y", (d) => y(d.Country))
       .attr("width", (d) => size(d.Total)) // Size based on CO2 emissions
       .attr("height", (d) => size(d.Total))
-      .attr("fill", (d) => color(Math.log10(d[metric] || 1))) // Updated color scale
+      .attr("fill", (d) => color(Math.log10(d[metric] || 1)))
       .on("click", (event, d) => {
-        // Update annotation box on click
         setAnnotation({
           x: event.pageX,
           y: event.pageY,
@@ -115,7 +115,47 @@ const Heatmap = ({ onGridClick }) => {
       .attr("font-size", "14px")
       .attr("font-weight", "bold")
       .text("Countries");
-  }, [data, metric, onGridClick]); // Update when data or metric changes
+
+    // Add color bar below heatmap
+    const colorBarWidth = 300;
+    const colorBarHeight = 20;
+    const colorBarScale = d3.scaleLinear().domain(color.domain()).range([0, colorBarWidth]);
+
+    const colorBarAxis = d3.axisBottom(colorBarScale).ticks(6).tickFormat((d) => `10^${Math.round(d)}`);
+
+    const colorBarGroup = colorBarSvg
+      .attr("width", colorBarWidth + 50)
+      .attr("height", colorBarHeight + 30)
+      .append("g")
+      .attr("transform", `translate(20,10)`);
+
+    // Gradient for color bar
+    const gradient = colorBarGroup
+      .append("defs")
+      .append("linearGradient")
+      .attr("id", "color-gradient")
+      .attr("x1", "0%")
+      .attr("x2", "100%")
+      .attr("y1", "0%")
+      .attr("y2", "0%");
+
+    gradient
+      .selectAll("stop")
+      .data(d3.range(0, 1.01, 0.01)) // Fine gradient steps
+      .join("stop")
+      .attr("offset", (d) => `${d * 100}%`)
+      .attr("stop-color", (d) => color(colorBarScale.invert(d * colorBarWidth)));
+
+    colorBarGroup
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", colorBarWidth)
+      .attr("height", colorBarHeight)
+      .style("fill", "url(#color-gradient)");
+
+    colorBarGroup.append("g").attr("transform", `translate(0,${colorBarHeight})`).call(colorBarAxis);
+  }, [data, metric, onGridClick]);
 
   const handleMetricChange = (event) => {
     setMetric(event.target.value);
@@ -136,6 +176,9 @@ const Heatmap = ({ onGridClick }) => {
 
       {/* Heatmap SVG */}
       <svg ref={svgRef} width={1000} height={500}></svg>
+
+      {/* Color Bar */}
+      <svg ref={colorBarRef}></svg>
 
       {/* Annotation Box */}
       {annotation && (
