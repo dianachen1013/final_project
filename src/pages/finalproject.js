@@ -42,12 +42,6 @@ export default function Home() {
       {/* Heatmap Section */}
       <div className={styles.Heatmap}>
         <h1>Fossil CO2 Analysis</h1>
-        {/* Add the description below the title */}
-        <p className={styles.description}>
-          This analysis provides insights into CO2 emissions, GDP, and population
-          trends across 15 countries from 2003 to 2023. Select a metric and
-          interact with the heatmap to explore the data.
-        </p>
         {data.length > 0 ? (
           <Heatmap
             data={data}
