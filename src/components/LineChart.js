@@ -5,107 +5,99 @@ const LineChart = ({ data }) => {
   const svgRef = useRef();
 
   useEffect(() => {
-    console.log("Raw Data passed to LineChart:", data);
-
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
     const width = 800;
     const height = 400;
-    const margin = { top: 20, right: 60, bottom: 50, left: 60 };
+    const margin = { top: 50, right: 100, bottom: 50, left: 100 };
 
-    // 预处理数据
-    const preparedData = data.map((d) => ({
-      Year: d.Year.toString(), // 确保 Year 是字符串
-      GDP: isNaN(+d.GDP) ? 0 : +d.GDP,
-      Total: isNaN(+d.Total) ? 0 : +d.Total,
-    }));
-
-    console.log("Prepared Data:", preparedData);
-
-    // 定义 x 轴
+    // Scales
     const x = d3
       .scaleTime()
-      .domain(d3.extent(preparedData, (d) => new Date(d.Year)))
+      .domain(d3.extent(data, (d) => new Date(d.Year)))
       .range([margin.left, width - margin.right]);
 
-    // 定义 y 轴
-    const yGDP = d3
+    const y1 = d3
       .scaleLinear()
-      .domain([0, d3.max(preparedData, (d) => d.GDP)])
+      .domain([0, d3.max(data, (d) => +d.GDP)])
       .nice()
       .range([height - margin.bottom, margin.top]);
 
-    const yTotal = d3
+    const y2 = d3
       .scaleLinear()
-      .domain([0, d3.max(preparedData, (d) => d.Total)])
+      .domain([0, d3.max(data, (d) => +d.Total)])
       .nice()
       .range([height - margin.bottom, margin.top]);
 
-    // 绘制 GDP 曲线
-    const gdpLine = d3
-      .line()
-      .x((d) => x(new Date(d.Year)))
-      .y((d) => yGDP(d.GDP));
+    // Axes
+    const xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat("%Y"));
+    const yAxisLeft = d3.axisLeft(y1);
+    const yAxisRight = d3.axisRight(y2);
 
-    console.log("GDP Line Path:", gdpLine(preparedData));
-
-    svg
-      .append("path")
-      .datum(preparedData)
-      .attr("fill", "none")
-      .attr("stroke", "black")
-      .attr("stroke-width", 2)
-      .attr("d", gdpLine);
-
-    // 绘制 Total Emission 曲线
-    const totalLine = d3
-      .line()
-      .x((d) => x(new Date(d.Year)))
-      .y((d) => yTotal(d.Total));
-
-    console.log("Total Line Path:", totalLine(preparedData));
-
-    svg
-      .append("path")
-      .datum(preparedData)
-      .attr("fill", "none")
-      .attr("stroke", "blue")
-      .attr("stroke-width", 2)
-      .attr("d", totalLine);
-
-    // 添加坐标轴
     svg
       .append("g")
       .attr("transform", `translate(0,${height - margin.bottom})`)
-      .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%Y")))
-      .selectAll("text")
-      .attr("transform", "rotate(-45)")
-      .style("text-anchor", "end");
+      .call(xAxis);
 
     svg
       .append("g")
       .attr("transform", `translate(${margin.left},0)`)
-      .call(d3.axisLeft(yGDP))
-      .append("text")
-      .attr("x", -margin.left / 2)
-      .attr("y", margin.top)
-      .attr("transform", "rotate(-90)")
-      .attr("fill", "black")
-      .attr("text-anchor", "middle")
-      .text("GDP (Hundred Million)");
+      .call(yAxisLeft);
 
     svg
       .append("g")
       .attr("transform", `translate(${width - margin.right},0)`)
-      .call(d3.axisRight(yTotal))
+      .call(yAxisRight);
+
+    // Add labels for Y axes
+    svg
       .append("text")
-      .attr("x", -margin.right / 2)
-      .attr("y", height / 2)
-      .attr("transform", "rotate(90)")
-      .attr("fill", "blue")
-      .attr("text-anchor", "middle")
-      .text("Total Emission (MT)");
+      .attr("transform", `rotate(0)`)
+      .attr("y", margin.left - 70)
+      .attr("x", margin.left + 40)
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .style("font-size", "12px")
+      .text("GDP (Hundred M)");
+
+    svg
+      .append("text")
+      .attr("transform", `rotate(0)`)
+      .attr("y", margin.top - 20)
+      .attr("x", width - margin.right - 40)
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .style("font-size", "12px")
+      .text("CO2 Emissions");
+
+    // Line for GDP
+    const lineGDP = d3
+      .line()
+      .x((d) => x(new Date(d.Year)))
+      .y((d) => y1(+d.GDP));
+
+    svg
+      .append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "blue")
+      .attr("stroke-width", 2)
+      .attr("d", lineGDP);
+
+    // Line for CO2 Emissions
+    const lineCO2 = d3
+      .line()
+      .x((d) => x(new Date(d.Year)))
+      .y((d) => y2(+d.Total));
+
+    svg
+      .append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "black")
+      .attr("stroke-width", 2)
+      .attr("d", lineCO2);
   }, [data]);
 
   return <svg ref={svgRef} width={800} height={400}></svg>;
