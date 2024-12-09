@@ -8,22 +8,14 @@ const PieChart = ({ data }) => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const width = 200; // Chart width
-    const height = 200; // Chart height
+    const width = 200; // 缩小宽度
+    const height = 200; // 缩小高度
     const radius = Math.min(width, height) / 2;
 
     const pie = d3.pie().value((d) => d.value);
     const arc = d3.arc().innerRadius(0).outerRadius(radius);
 
-    // Define custom colors for the pie chart
-    const color = d3.scaleOrdinal([
-      "#FF5733", // Coal
-      "#33FF57", // Oil
-      "#3357FF", // Gas
-      "#FF33A1", // Cement
-      "#FFC133", // Flaring
-      "#8C33FF", // Other
-    ]);
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
 
     const legendHeight = 20;
 
@@ -43,15 +35,16 @@ const PieChart = ({ data }) => {
         svg
           .append("text")
           .attr("id", "tooltip")
-          .attr("x", width / 2 + radius + 100) // Tooltip position
-          .attr("y", height / 2 + radius - 20)
-          .attr("text-anchor", "end")
+          .attr("x", width / 2 + radius +100) // 右下角相对位置
+          .attr("y", height / 2 + radius - 20) // 右下角距离底部一定高度
+          .attr("text-anchor", "end") // 右对齐
           .style("font-size", "10px")
           .text(`${d.data.label}: ${d.data.value} (${d.data.percentage}%)`);
       })
       .on("mouseout", () => {
         svg.select("#tooltip").remove();
       });
+      
 
     // Create legend
     const legendGroup = svg
