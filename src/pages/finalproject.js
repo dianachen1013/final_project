@@ -6,7 +6,8 @@ import LineChart from "../components/LineChart";
 import styles from "../styles/final_project.module.css";
 
 const dataUrl =
- "https://raw.githubusercontent.com/bettyzzzr/fall2024-iv-final-project/refs/heads/main/15国碳排放.csv"
+  "https://raw.githubusercontent.com/bettyzzzr/fall2024-iv-final-project/refs/heads/main/15国碳排放.csv";
+
 export default function Home() {
   const [data, setData] = useState([]);
   const [selectedData, setSelectedData] = useState(null); // Stores the clicked square data
@@ -42,14 +43,18 @@ export default function Home() {
       <div className={styles.Heatmap}>
         <h1>Fossil CO2 Analysis</h1>
         {data.length > 0 ? (
-          <Heatmap data={data} metric="Population" onGridClick={handleCellClick} />
+          <Heatmap
+            data={data}
+            metric="Population"
+            onGridClick={handleCellClick}
+          />
         ) : (
           <p>Loading data...</p>
         )}
       </div>
 
-      {/* Right-side Charts Section */}
-      <div className={styles["right-charts"]}>
+      {/* Bottom Charts Section */}
+      <div className={styles["bottom-charts"]}>
         {/* Pie Chart */}
         <div className={styles.PieChart}>
           {selectedData && (
@@ -85,9 +90,8 @@ function preparePieChartData(selectedData) {
   ];
 }
 
-
 function prepareLineChartData(data, selectedData) {
   return data
     .filter((d) => d.Country === selectedData.Country)
-    .map((d) => ({ Year: d.Year, Total: d['Total'], GDP: d["GDP"] }));
+    .map((d) => ({ Year: d.Year, Total: d["Total"], GDP: d["GDP"] }));
 }
