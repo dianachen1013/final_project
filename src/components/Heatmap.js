@@ -56,16 +56,8 @@ const Heatmap = ({ onGridClick }) => {
       });
 
     // Scales
-    const x = d3
-      .scaleBand()
-      .domain(years)
-      .range([margin.left, width - margin.right])
-      .padding(0.1);
-    const y = d3
-      .scaleBand()
-      .domain(countries)
-      .range([margin.top, height - margin.bottom])
-      .padding(0.1);
+    const x = d3.scaleBand().domain(years).range([margin.left, width - margin.right]).padding(0.1);
+    const y = d3.scaleBand().domain(countries).range([margin.top, height - margin.bottom]).padding(0.1);
 
     const color = d3
       .scaleSequential()
@@ -125,11 +117,7 @@ const Heatmap = ({ onGridClick }) => {
 
     // Add vertical color bar
     const colorBarHeight = 300;
-    const colorBarDomain = metric === "Population" 
-      ? [Math.log10(d3.min(data, (d) => d.Population) || 1), Math.log10(d3.max(data, (d) => d.Population))]
-      : [Math.log10(1), Math.log10(d3.max(data, (d) => d[metric] || 1))];
-
-    const colorBarScale = d3.scaleLinear().domain(colorBarDomain).range([colorBarHeight, 0]);
+    const colorBarScale = d3.scaleLinear().domain(color.domain()).range([colorBarHeight, 0]);
 
     const colorAxis = d3.axisRight(colorBarScale).ticks(6).tickFormat((d) => `10^${Math.round(d)}`);
 
@@ -139,16 +127,13 @@ const Heatmap = ({ onGridClick }) => {
       .data(d3.range(0, 1, 0.01))
       .join("rect")
       .attr("x", 0)
-      .attr("y", (d, i) => i * (colorBarHeight / 100)) // Ensure proper spacing for each color step
+      .attr("y", (d) => d * colorBarHeight)
       .attr("width", 20)
-      .attr("height", colorBarHeight / 100) // Match the height of each color step
-      .attr("fill", (d, i) =>
-        color(
-          colorBarScale.invert(i * (colorBarHeight / 100)) // Match color scale with domain
-        )
-      );
+      .attr("height", 1)
+      .attr("fill", (d) => color(colorBarScale.invert(d * colorBarHeight)));
 
     colorBar.append("g").attr("transform", "translate(20, 0)").call(colorAxis);
+  }, [data, metric, onGridClick]);
 
   const handleMetricChange = (event) => {
     setMetric(event.target.value);
