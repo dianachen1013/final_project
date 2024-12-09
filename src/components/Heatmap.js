@@ -31,8 +31,8 @@ const Heatmap = ({ onGridClick }) => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const width = 800;
-    const height = 400;
+    const width = 100;
+    const height = 500;
     const margin = { top: 50, right: 20, bottom: 50, left: 100 };
 
     // Extract years dynamically from the dataset
