@@ -6,7 +6,6 @@ const dataUrl =
 
 const Heatmap = ({ onGridClick }) => {
   const svgRef = useRef();
-  const colorBarRef = useRef();
   const [data, setData] = useState([]);
   const [metric, setMetric] = useState("Population"); // Default metric
   const [annotation, setAnnotation] = useState(null); // State for annotation box
@@ -30,13 +29,11 @@ const Heatmap = ({ onGridClick }) => {
     if (data.length === 0) return;
 
     const svg = d3.select(svgRef.current);
-    const colorBar = d3.select(colorBarRef.current);
     svg.selectAll("*").remove();
-    colorBar.selectAll("*").remove();
 
-    const width = 800;
+    const width = 900;
     const height = 400;
-    const margin = { top: 50, right: 20, bottom: 50, left: 100 };
+    const margin = { top: 50, right: 100, bottom: 50, left: 100 };
 
     // Extract years dynamically from the dataset
     const years = Array.from(new Set(data.map((d) => d.Year)))
@@ -56,22 +53,25 @@ const Heatmap = ({ onGridClick }) => {
       });
 
     // Scales
-    const x = d3.scaleBand().domain(years).range([margin.left, width - margin.right]).padding(0.1);
-    const y = d3.scaleBand().domain(countries).range([margin.top, height - margin.bottom]).padding(0.1);
+    const x = d3
+      .scaleBand()
+      .domain(years)
+      .range([margin.left, width - margin.right])
+      .padding(0.1);
 
+    const y = d3
+      .scaleBand()
+      .domain(countries)
+      .range([margin.top, height - margin.bottom])
+      .padding(0.1);
+
+    // Color scale
     const color = d3
-      .scaleSequential()
-      .domain(
-        metric === "Population"
-          ? [Math.log10(d3.min(data, (d) => d.Population) || 1), Math.log10(d3.max(data, (d) => d.Population))]
-          : [Math.log10(1), Math.log10(d3.max(data, (d) => d[metric] || 1))]
-      )
-      .interpolator(metric === "Population" ? d3.interpolateBlues : d3.interpolateGreens);
-
-    const size = d3
-      .scaleSqrt()
-      .domain(d3.extent(data, (d) => d.Total))
-      .range([2, x.bandwidth() / 2]);
+      .scaleSequential(d3.interpolateBlues)
+      .domain([
+        Math.log10(d3.min(data, (d) => d[metric]) || 1),
+        Math.log10(d3.max(data, (d) => d[metric]) || 1),
+      ]);
 
     // Create heatmap squares
     svg
@@ -81,8 +81,8 @@ const Heatmap = ({ onGridClick }) => {
       .join("rect")
       .attr("x", (d) => x(d.Year))
       .attr("y", (d) => y(d.Country))
-      .attr("width", (d) => size(d.Total))
-      .attr("height", (d) => size(d.Total))
+      .attr("width", x.bandwidth())
+      .attr("height", y.bandwidth())
       .attr("fill", (d) => color(Math.log10(d[metric] || 1)))
       .on("click", (event, d) => {
         setAnnotation({
@@ -90,7 +90,7 @@ const Heatmap = ({ onGridClick }) => {
           y: event.pageY,
           data: d,
         });
-        onGridClick(d);
+        onGridClick(d); // Trigger parent click handler
       });
 
     // Add x-axis
@@ -103,7 +103,10 @@ const Heatmap = ({ onGridClick }) => {
       .style("text-anchor", "end");
 
     // Add y-axis
-    svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y));
+    svg
+      .append("g")
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y));
 
     // Add title for y-axis
     svg
@@ -115,45 +118,93 @@ const Heatmap = ({ onGridClick }) => {
       .attr("font-weight", "bold")
       .text("Countries");
 
-    // Add vertical color bar
+    // Add color bar
     const colorBarHeight = 300;
-    const colorBarScale = d3.scaleLinear().domain(color.domain()).range([colorBarHeight, 0]);
+    const colorBarWidth = 20;
+
+    const colorBarScale = d3
+      .scaleLinear()
+      .domain([
+        Math.log10(d3.min(data, (d) => d[metric]) || 1),
+        Math.log10(d3.max(data, (d) => d[metric]) || 1),
+      ])
+      .range([colorBarHeight, 0]);
 
     const colorAxis = d3.axisRight(colorBarScale).ticks(6).tickFormat((d) => `10^${Math.round(d)}`);
 
-    colorBar
+    const colorBar = svg
       .append("g")
+      .attr(
+        "transform",
+        `translate(${width - margin.right + 40},${(height - colorBarHeight) / 2})`
+      );
+
+    colorBar
       .selectAll("rect")
       .data(d3.range(0, 1, 0.01))
       .join("rect")
       .attr("x", 0)
-      .attr("y", (d) => d * colorBarHeight)
-      .attr("width", 20)
-      .attr("height", 1)
-      .attr("fill", (d) => color(colorBarScale.invert(d * colorBarHeight)));
+      .attr("y", (d, i) => i * (colorBarHeight / 100))
+      .attr("width", colorBarWidth)
+      .attr("height", colorBarHeight / 100)
+      .attr("fill", (d) =>
+        d3.interpolateBlues(d)
+      );
 
-    colorBar.append("g").attr("transform", "translate(20, 0)").call(colorAxis);
-  }, [data, metric, onGridClick]);
+    colorBar.append("g").attr("transform", `translate(${colorBarWidth}, 0)`).call(colorAxis);
+  }, [data, metric, onGridClick]); // Update when data or metric changes
 
   const handleMetricChange = (event) => {
     setMetric(event.target.value);
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
-      <div style={{ marginRight: "20px" }}>
-        <div style={{ marginBottom: "20px" }}>
-          <label htmlFor="metric-select" style={{ marginRight: "10px" }}>
-            Select Metric:
-          </label>
-          <select id="metric-select" value={metric} onChange={handleMetricChange}>
-            <option value="Population">Population</option>
-            <option value="GDP">GDP</option>
-          </select>
-        </div>
-        <svg ref={svgRef} width={800} height={400}></svg>
+    <div style={{ position: "relative" }}>
+      {/* Dropdown Menu */}
+      <div style={{ marginBottom: "20px" }}>
+        <label htmlFor="metric-select" style={{ marginRight: "10px" }}>
+          Select Metric:
+        </label>
+        <select id="metric-select" value={metric} onChange={handleMetricChange}>
+          <option value="Population">Population</option>
+          <option value="GDP">GDP</option>
+        </select>
       </div>
-      <svg ref={colorBarRef} width={50} height={400}></svg>
+
+      {/* Heatmap SVG */}
+      <svg ref={svgRef} width={900} height={400}></svg>
+
+      {/* Annotation Box */}
+      {annotation && (
+        <div
+          style={{
+            position: "absolute",
+            top: annotation.y + 10,
+            left: annotation.x + 10,
+            backgroundColor: "white",
+            border: "1px solid black",
+            padding: "10px",
+            borderRadius: "5px",
+            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
+          }}
+        >
+          <p>
+            <strong>Country:</strong> {annotation.data.Country}
+          </p>
+          <p>
+            <strong>Year:</strong> {annotation.data.Year}
+          </p>
+          <p>
+            <strong>GDP:</strong> {annotation.data.GDP}
+          </p>
+          <p>
+            <strong>Population:</strong> {annotation.data.Population}
+          </p>
+          <p>
+            <strong>CO2 Emissions:</strong> {annotation.data.Total}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
