@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 
 const dataUrl =
-  "https://raw.githubusercontent.com/bettyzzzr/fall2024-iv-final-project-data/refs/heads/main/15%E5%9B%BD%E7%A2%B3%E6%8E%92%E6%94%BE.csv";
+  "https://raw.githubusercontent.com/bettyzzzr/fall2024-iv-final-project-data/refs/heads/main/15%E5%9B%BD%E7%A2%B3%E6%8E%90%E6%94%BE.csv";
 
 const Heatmap = ({ onGridClick }) => {
   const svgRef = useRef();
@@ -56,8 +56,16 @@ const Heatmap = ({ onGridClick }) => {
       });
 
     // Scales
-    const x = d3.scaleBand().domain(years).range([margin.left, width - margin.right]).padding(0.1);
-    const y = d3.scaleBand().domain(countries).range([margin.top, height - margin.bottom]).padding(0.1);
+    const x = d3
+      .scaleBand()
+      .domain(years)
+      .range([margin.left, width - margin.right])
+      .padding(0.1);
+    const y = d3
+      .scaleBand()
+      .domain(countries)
+      .range([margin.top, height - margin.bottom])
+      .padding(0.1);
 
     const color = d3
       .scaleSequential()
@@ -84,12 +92,17 @@ const Heatmap = ({ onGridClick }) => {
       .attr("width", (d) => size(d.Total))
       .attr("height", (d) => size(d.Total))
       .attr("fill", (d) => color(Math.log10(d[metric] || 1)))
-      .on("click", (event, d) => {
+      .on("mouseover", (event, d) => {
         setAnnotation({
           x: event.pageX,
           y: event.pageY,
           data: d,
         });
+      })
+      .on("mouseout", () => {
+        setAnnotation(null); // Hide annotation on mouse out
+      })
+      .on("click", (event, d) => {
         onGridClick(d);
       });
 
@@ -117,69 +130,26 @@ const Heatmap = ({ onGridClick }) => {
 
     // Add vertical color bar
     const colorBarHeight = 300;
-    const colorBarScale = d3.scaleLinear().domain(color.domain()).range([colorBarHeight, 0]);
+    const colorBarScale = d3
+      .scaleLinear()
+      .domain(color.domain())
+      .range([colorBarHeight, 0]); // Reverse scale for proper color mapping
 
     const colorAxis = d3.axisRight(colorBarScale).ticks(6).tickFormat((d) => `10^${Math.round(d)}`);
 
     colorBar
       .append("g")
       .selectAll("rect")
-      .data(d3.range(0, 1, 0.01))
+      .data(d3.range(0, 1, 0.01)) // Create fine gradient steps
       .join("rect")
       .attr("x", 0)
       .attr("y", (d) => d * colorBarHeight)
       .attr("width", 20)
-      .attr("height", 1)
+      .attr("height", colorBarHeight / 100)
       .attr("fill", (d) => color(colorBarScale.invert(d * colorBarHeight)));
 
     colorBar.append("g").attr("transform", "translate(20, 0)").call(colorAxis);
   }, [data, metric, onGridClick]);
 
   const handleMetricChange = (event) => {
-    setMetric(event.target.value);
-  };
-
-  return (
-    <div style={{ display: "flex", alignItems: "center", position: "relative" }}>
-      <div style={{ marginRight: "20px" }}>
-        <div style={{ marginBottom: "20px" }}>
-          <label htmlFor="metric-select" style={{ marginRight: "10px" }}>
-            Select Metric:
-          </label>
-          <select id="metric-select" value={metric} onChange={handleMetricChange}>
-            <option value="Population">Population</option>
-            <option value="GDP">GDP</option>
-          </select>
-        </div>
-        <svg ref={svgRef} width={800} height={400}></svg>
-      </div>
-      <svg ref={colorBarRef} width={50} height={400}></svg>
-
-      {/* Annotation Box */}
-      {annotation && (
-        <div
-          style={{
-            position: "absolute",
-            top: annotation.y + 10,
-            left: annotation.x + 10,
-            backgroundColor: "white",
-            border: "1px solid black",
-            padding: "10px",
-            borderRadius: "5px",
-            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
-            pointerEvents: "none",
-            zIndex: 10,
-          }}
-        >
-          <p><strong>Country:</strong> {annotation.data.Country}</p>
-          <p><strong>Year:</strong> {annotation.data.Year}</p>
-          <p><strong>GDP:</strong> {annotation.data.GDP}</p>
-          <p><strong>Population:</strong> {annotation.data.Population}</p>
-          <p><strong>CO2 Emissions:</strong> {annotation.data.Total}</p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default Heatmap;
+    setMetric(event.target.value)
