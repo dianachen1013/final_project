@@ -31,9 +31,9 @@ const Heatmap = ({ onGridClick }) => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const width = 800;
-    const height = 400;
-    const margin = { top: 50, right: 20, bottom: 50, left: 100 };
+    const width = 1200; // Increased width
+    const height = 600; // Increased height
+    const margin = { top: 60, right: 20, bottom: 70, left: 120 };
 
     // Extract years dynamically from the dataset
     const years = Array.from(new Set(data.map((d) => d.Year)))
@@ -106,54 +106,4 @@ const Heatmap = ({ onGridClick }) => {
       .attr("x", margin.left - 50)
       .attr("y", margin.top - 10)
       .attr("text-anchor", "middle")
-      .attr("font-size", "14px")
-      .attr("font-weight", "bold")
-      .text("Countries");
-  }, [data, metric, onGridClick]); // Update when data or metric changes
-
-  const handleMetricChange = (event) => {
-    setMetric(event.target.value);
-  };
-
-  return (
-    <div style={{ position: "relative" }}>
-      {/* Dropdown Menu */}
-      <div style={{ marginBottom: "20px" }}>
-        <label htmlFor="metric-select" style={{ marginRight: "10px" }}>
-          Select Metric:
-        </label>
-        <select id="metric-select" value={metric} onChange={handleMetricChange}>
-          <option value="Population">Population</option>
-          <option value="GDP">GDP</option>
-        </select>
-      </div>
-
-      {/* Heatmap SVG */}
-      <svg ref={svgRef} width={800} height={400}></svg>
-
-      {/* Annotation Box */}
-      {annotation && (
-        <div
-          style={{
-            position: "absolute",
-            top: annotation.y + 10,
-            left: annotation.x + 10,
-            backgroundColor: "white",
-            border: "1px solid black",
-            padding: "10px",
-            borderRadius: "5px",
-            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          <p><strong>Country:</strong> {annotation.data.Country}</p>
-          <p><strong>Year:</strong> {annotation.data.Year}</p>
-          <p><strong>GDP:</strong> {annotation.data.GDP}</p>
-          <p><strong>Population:</strong> {annotation.data.Population}</p>
-          <p><strong>CO2 Emissions:</strong> {annotation.data.Total}</p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default Heatmap;
+      .attr("font-size", "14
