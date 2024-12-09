@@ -123,9 +123,9 @@ const Heatmap = ({ onGridClick }) => {
       .attr("font-weight", "bold")
       .text("Countries");
 
-    // Add vertical color bar
+    // Add vertical color bar with reversed scale
     const colorBarHeight = 300;
-    const colorBarScale = d3.scaleLinear().domain(color.domain()).range([colorBarHeight, 0]);
+    const colorBarScale = d3.scaleLinear().domain(color.domain()).range([0, colorBarHeight]); // Reverse range
 
     const colorAxis = d3.axisRight(colorBarScale).ticks(6).tickFormat((d) => `10^${Math.round(d)}`);
 
