@@ -12,10 +12,13 @@ const LineChart = ({ data }) => {
     const height = 400;
     const margin = { top: 50, right: 100, bottom: 50, left: 100 };
 
+    // Parse years as integers (if not already)
+    const years = data.map((d) => +d.Year);
+
     // Scales
     const x = d3
-      .scaleTime()
-      .domain(d3.extent(data, (d) => new Date(d.Year)))
+      .scaleLinear() // Use a linear scale for years
+      .domain(d3.extent(years)) // Get min and max of the years (2003 to 2023)
       .range([margin.left, width - margin.right]);
 
     const y1 = d3
@@ -31,7 +34,7 @@ const LineChart = ({ data }) => {
       .range([height - margin.bottom, margin.top]);
 
     // Axes
-    const xAxis = d3.axisBottom(x).tickFormat(d3.timeFormat("%Y"));
+    const xAxis = d3.axisBottom(x).tickFormat(d3.format("d")); // Display years as integers
     const yAxisLeft = d3.axisLeft(y1);
     const yAxisRight = d3.axisRight(y2);
 
@@ -53,7 +56,6 @@ const LineChart = ({ data }) => {
     // Add labels for Y axes
     svg
       .append("text")
-      .attr("transform", `rotate(0)`)
       .attr("y", margin.left - 70)
       .attr("x", margin.left + 40)
       .attr("dy", "1em")
@@ -63,7 +65,6 @@ const LineChart = ({ data }) => {
 
     svg
       .append("text")
-      .attr("transform", `rotate(0)`)
       .attr("y", margin.top - 20)
       .attr("x", width - margin.right - 40)
       .attr("dy", "1em")
@@ -74,7 +75,7 @@ const LineChart = ({ data }) => {
     // Line for GDP
     const lineGDP = d3
       .line()
-      .x((d) => x(new Date(d.Year)))
+      .x((d) => x(+d.Year)) // Use the numeric year value
       .y((d) => y1(+d.GDP));
 
     svg
@@ -88,7 +89,7 @@ const LineChart = ({ data }) => {
     // Line for CO2 Emissions
     const lineCO2 = d3
       .line()
-      .x((d) => x(new Date(d.Year)))
+      .x((d) => x(+d.Year)) // Use the numeric year value
       .y((d) => y2(+d.Total));
 
     svg
