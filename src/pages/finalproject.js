@@ -45,6 +45,9 @@ export default function Home() {
         <p className={styles.description}>
           Fossil fuel CO2 emissions play a critical role in global climate change and environmental policy. Understanding emission patterns over time and across different regions can inform decisions and raise public awareness. This visualization project aims to provide an interactive platform for exploring global fossil CO2 emissions, allowing users to analyze temporal trends, geographic distributions, and potential correlations with other factors like GDP or population.
         </p>
+        <p className={styles.description}>
+          The size of the grid represents the amount of CO2 emission. The color intensity shows the level of population or GDP.
+        </p>
         {data.length > 0 ? (
           <Heatmap
             data={data}
