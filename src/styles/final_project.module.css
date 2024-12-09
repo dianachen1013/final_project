@@ -7,13 +7,6 @@
   background-color: #fdf6e3; /* Light beige background */
 }
 
-/* Global body style */
-:global(body) {
-  margin: 0;
-  background-color: #fdf6e3; /* Light beige background */
-  font-family: Arial, sans-serif; /* Optional: Add consistent font */
-}
-
 /* Heatmap section (full width) */
 .Heatmap {
   flex: 2;
