@@ -6,7 +6,7 @@ const dataUrl =
 
 const Heatmap = ({ onGridClick }) => {
   const svgRef = useRef();
-  const colorBarRef = useRef(); // Ref for the color bar
+  const colorBarRef = useRef();
   const [data, setData] = useState([]);
   const [metric, setMetric] = useState("Population"); // Default metric
   const [annotation, setAnnotation] = useState(null); // State for annotation box
@@ -69,6 +69,7 @@ const Heatmap = ({ onGridClick }) => {
       ) // Avoid log(0)
       .interpolator(metric === "Population" ? d3.interpolateBlues : d3.interpolateGreens); // Use distinct colors for Population
 
+    // Use size scale for CO2 emissions
     const size = d3
       .scaleSqrt()
       .domain(d3.extent(data, (d) => d.Total))
@@ -84,8 +85,9 @@ const Heatmap = ({ onGridClick }) => {
       .attr("y", (d) => y(d.Country))
       .attr("width", (d) => size(d.Total)) // Size based on CO2 emissions
       .attr("height", (d) => size(d.Total))
-      .attr("fill", (d) => color(Math.log10(d[metric] || 1)))
+      .attr("fill", (d) => color(Math.log10(d[metric] || 1))) // Updated color scale
       .on("click", (event, d) => {
+        // Update annotation box on click
         setAnnotation({
           x: event.pageX,
           y: event.pageY,
@@ -119,9 +121,16 @@ const Heatmap = ({ onGridClick }) => {
     // Add color bar below heatmap
     const colorBarWidth = 300;
     const colorBarHeight = 20;
-    const colorBarScale = d3.scaleLinear().domain(color.domain()).range([0, colorBarWidth]);
 
-    const colorBarAxis = d3.axisBottom(colorBarScale).ticks(6).tickFormat((d) => `10^${Math.round(d)}`);
+    const colorBarScale = d3
+      .scaleLinear()
+      .domain([Math.log10(d3.min(data, (d) => d[metric]) || 1), Math.log10(d3.max(data, (d) => d[metric]))])
+      .range([0, colorBarWidth]);
+
+    const colorBarAxis = d3
+      .axisBottom(colorBarScale)
+      .ticks(6) // Set the number of ticks
+      .tickFormat((d) => Math.pow(10, d).toExponential(0)); // Convert back from log scale
 
     const colorBarGroup = colorBarSvg
       .attr("width", colorBarWidth + 50)
@@ -129,7 +138,6 @@ const Heatmap = ({ onGridClick }) => {
       .append("g")
       .attr("transform", `translate(20,10)`);
 
-    // Gradient for color bar
     const gradient = colorBarGroup
       .append("defs")
       .append("linearGradient")
@@ -155,7 +163,7 @@ const Heatmap = ({ onGridClick }) => {
       .style("fill", "url(#color-gradient)");
 
     colorBarGroup.append("g").attr("transform", `translate(0,${colorBarHeight})`).call(colorBarAxis);
-  }, [data, metric, onGridClick]);
+  }, [data, metric, onGridClick]); // Update when data or metric changes
 
   const handleMetricChange = (event) => {
     setMetric(event.target.value);
