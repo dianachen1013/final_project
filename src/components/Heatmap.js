@@ -153,7 +153,7 @@ const Heatmap = ({ onGridClick }) => {
           <p><strong>Country:</strong> {annotation.data.Country}</p>
           <p><strong>Year:</strong> {annotation.data.Year}</p>
           <p><strong>GDP:</strong> {(annotation.data.GDP * 10).toFixed(2)} billion USD</p>
-          <p><strong>Population:</strong> {annotation.data.Population.toLocaleString()}
+          <p><strong>Population:</strong> {annotation.data.Population.toLocaleString()}</p>
           <p><strong>CO2 Emissions:</strong> {(annotation.data.Total).toFixed(2)} million metric tons</p>
         </div>
       )}
