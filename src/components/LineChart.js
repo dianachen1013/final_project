@@ -61,7 +61,9 @@ const LineChart = ({ data }) => {
       .attr("dy", "1em")
       .style("text-anchor", "middle")
       .style("font-size", "12px")
+      .style("fill", "blue") // Set the label color to blue
       .text("GDP (Hundred M)");
+
 
     svg
       .append("text")
@@ -70,7 +72,7 @@ const LineChart = ({ data }) => {
       .attr("dy", "1em")
       .style("text-anchor", "middle")
       .style("font-size", "12px")
-      .text("CO2 Emissions");
+      .text("CO2 Emissions (Metric tons)");
 
     // Line for GDP
     const lineGDP = d3
